@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans default-lazy-init="true"
+    xmlns="http://www.springframework.org/schema/beans" 
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:aop="http://www.springframework.org/schema/aop" 
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+    xsi:schemaLocation="  
+       http://www.springframework.org/schema/beans   
+       http://www.springframework.org/schema/beans/spring-beans-4.3.xsd  
+       http://www.springframework.org/schema/mvc   
+       http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd   
+       http://www.springframework.org/schema/tx   
+       http://www.springframework.org/schema/tx/spring-tx-4.3.xsd   
+       http://www.springframework.org/schema/aop 
+       http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+       http://www.springframework.org/schema/util 
+       http://www.springframework.org/schema/util/spring-util-4.3.xsd
+       http://www.springframework.org/schema/data/jpa 
+       http://www.springframework.org/schema/data/jpa/spring-jpa-1.3.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context-4.3.xsd" >
+      
+      <util:properties id="cfg" location="classpath:configs.properties"/>
+      <!-- 配置DRUID数据库连接池 -->
+      <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource"
+            init-method="init" destroy-method="close">
+         <property name="driverClassName" value="#{cfg.driver}"/> 
+         <property name="url" value="#{cfg.url}"/>
+         <property name="username" value="#{cfg.username}"/>
+         <property name="password" value="#{cfg.password}"/>
+      </bean>
+      <!-- 配置sqlSessionFactory(www.mybatis.org) -->
+      <bean id="sqlSessionFactory" 
+            class="org.mybatis.spring.SqlSessionFactoryBean">
+            <property name="dataSource" ref="dataSource"/>
+            <property name="configLocation" 
+                      value="classpath:mybatis-configs.xml"/>
+      </bean>
+      <!-- 配置DAO扫描(底层要为dao接口创建实现类对象,并将对象存储到
+       spring容器中) -->
+      <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+          <property name="basePackage" value="com.jt.dao"/>
+          <!-- 下面选项可选，何时配置？(当存在多个sqlSessionFactory类型对象时) -->
+          <property name="sqlSessionFactoryBeanName" 
+                    value="sqlSessionFactory"/>
+      </bean>
+       <!-- 整合spring mvc -->
+       <!-- 配置对指定包中类的扫描 -->
+       <context:component-scan base-package="com.jt"/>
+       <!-- 启用mvc注解 -->
+       <mvc:annotation-driven/>
+       <!-- 配置视图解析 -->
+       <!-- 配置视图解析/WEB-INF/pages/hello.jsp -->
+       <bean id="viewResolver" 
+             class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+             <property name="prefix" value="/WEB-INF/pages/"/>
+             <property name="suffix" value=".jsp"></property>
+       </bean>
+      
+</beans>
+
+
+
+
+
+
+
+
+
